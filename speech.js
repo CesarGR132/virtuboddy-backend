@@ -2,7 +2,9 @@ const startButton = document.getElementById('startButton')
 const outputDiv = document.getElementById('output')
 
 // Check for browser support
-const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition || window.msSpeechRecognition
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+
+console.log(SpeechRecognition)
 
 if (SpeechRecognition) {
   const recognition = new SpeechRecognition()
