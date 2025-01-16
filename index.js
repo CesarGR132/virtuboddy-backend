@@ -24,6 +24,17 @@ app.post('/summarize', async (req, res) => {
   }
 })
 
+app.post('/send-email', (req, res) => {
+  const { email, text } = req.body
+
+  try {
+    UserActions.sendEmail({ email, text })
+    res.send('Email sent!')
+  } catch (error) {
+    res.status(500).send(error.message)
+  }
+})
+
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`)
 })
