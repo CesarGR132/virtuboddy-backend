@@ -6,6 +6,16 @@ config()
 
 const hf = new HfInference(process.env.HF_ACCESS_TOKEN)
 
+const transporter = nodemailer.createTransport({
+  host: 'smtp.gmail.com',
+  port: 465,
+  secure: true,
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASSWORD
+  }
+})
+
 export class UserActions {
   static async summarize ({ text }) {
     const textSummarized = await hf.summarization({
@@ -18,29 +28,25 @@ export class UserActions {
     return textSummarized
   }
 
-  static async sendEmail ({ email, text }) {
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASSWORD
-      }
-    })
-
-    const mailOptions = {
-      from: email,
-      to: 'cesargabriel132@gmail.com',
-      subject: 'Sending Email using Node.js',
-      text
+  static async sendEmail ({ text, recipient, subject }) {
+    if (!recipient) {
+      throw new Error('No recipient defined')
     }
 
-    transporter.sendMail(mailOptions, function (error, info) {
-      if (error) {
-        console.log(error)
-      } else {
-        console.log('Email sent: ' + info.response)
-        return info.response
-      }
-    })
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: recipient,
+      subject,
+      html: `<p>${text}</p>`
+    }
+
+    try {
+      const info = await transporter.sendMail(mailOptions)
+      console.log('Email sent successfully:', info.response)
+      return info.messageId
+    } catch (error) {
+      console.error('Error sending email:', error)
+      return error.message
+    }
   }
 }

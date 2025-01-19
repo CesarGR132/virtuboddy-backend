@@ -24,12 +24,12 @@ app.post('/summarize', async (req, res) => {
   }
 })
 
-app.post('/send-email', (req, res) => {
-  const { email, text } = req.body
+app.post('/send-email', async (req, res) => {
+  const { text, recipient, subject } = req.body
 
   try {
-    UserActions.sendEmail({ email, text })
-    res.send('Email sent!')
+    const meessageId = await UserActions.sendEmail({ text, recipient, subject })
+    res.send(`Email sent successfully: ${meessageId}`)
   } catch (error) {
     res.status(500).send(error.message)
   }
